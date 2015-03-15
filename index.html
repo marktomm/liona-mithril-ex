@@ -1,0 +1,116 @@
+<!doctype html>
+<title>Coordinate app</title>
+<script src="mithril.min.js"></script>
+<script>
+var input_json = [
+  {"x" : 50, "y" : 55, "country" : "EE", "url" : "#"},
+  {"x" : 60, "y" : 65, "country" : "RU", "url" : "#"},
+  {"x" : 70, "y" : 75, "country" : "KO", "url" : "#"},
+  {"x" : 80, "y" : 85, "country" : "AU", "url" : "#"}
+];
+  
+  
+//this application only has one module: coordinates
+var coordinates = {};
+
+//for simplicity, we use this module to namespace the model classes
+
+//the Coordinate class has two properties
+coordinates.Coordinate = function(data) {
+    this.x = m.prop(data.x);
+    this.y = m.prop(data.y);
+    this.country = m.prop(data.country);
+    this.url = m.prop(data.url);
+};
+
+//the CoordinateList class is a list of Coordinate's
+coordinates.CoordinateList = Array;
+
+//the view-model tracks a running list of coordinates,
+//stores a description for new coordinates before they are created
+//and takes care of the logic surrounding when adding is permitted
+//and clearing the input after adding a coordinates to the list
+coordinates.vm = (function() {
+    var vm = {}
+    vm.init = function(data) {
+        //a running list of coordinates
+        vm.list = new coordinates.CoordinateList();
+        
+        //initial input data
+        vm.data = data;
+
+        //adds a coordinates to the list
+        vm.add = function() {
+            if (vm.x() && vm.y() && vm.country() && vm.url()) {
+                vm.list.push(new coordinates.Coordinate({x: vm.x(), y: vm.y(), country: vm.country(), url: vm.url()}));
+            }
+        };
+        
+        //use add funciton to sync current list with the input data
+        for(i=0; i < data.length; i++) {
+            vm.x = m.prop(data[i].x);
+            vm.y = m.prop(data[i].y);
+            vm.country = m.prop(data[i].country);
+            vm.url = m.prop(data[i].url);
+            
+            vm.add();
+        }
+        
+        //update input data with current view
+        vm.update = function() {
+            for(i=0; i < data.length; i++) {
+                data[i].x = vm.list[i].x();
+                data[i].y = vm.list[i].y();
+                data[i].country = vm.list[i].country();
+                data[i].url = vm.list[i].url();
+            }
+        }
+        
+        //restore view to previous state
+        vm.restore = function() {
+            for(i=0; i < data.length; i++) {
+                vm.list[i].x( data[i].x );
+                vm.list[i].y( data[i].y );
+                vm.list[i].country( data[i].country );
+                vm.list[i].url( data[i].url );
+            }
+        }
+        
+        vm.log = function() {
+            console.log(vm.data);
+        }
+    }
+    return vm
+}())
+
+//the controller defines what part of the model is relevant for the current page
+//in our case, there's only one view-model that handles everything
+coordinates.controller = function() {
+    coordinates.vm.init(input_json)
+}
+
+//here's the view
+coordinates.view = function() {
+    return m("html", [
+        m("body", [
+            m("table", [
+                coordinates.vm.list.map(function(coordRow, index) {
+                    return m("tr", [
+                        m("input", {onchange: m.withAttr("value", coordRow.x), value: coordRow.x()}),
+                        m("input", {onchange: m.withAttr("value", coordRow.y), value: coordRow.y()}),
+                        m("input", {onchange: m.withAttr("value", coordRow.country), value: coordRow.country()}),
+                        m("input", {onchange: m.withAttr("value", coordRow.url), value: coordRow.url()})
+                    ])
+                })
+            ]),
+            m("button", {onclick: coordinates.vm.update}, "Update"),
+            m("button", {onclick: coordinates.vm.restore}, "Cancel"),
+            m("button", {onclick: coordinates.vm.log}, "Log" )
+        ])
+    ]);
+};
+
+//initialize the application
+m.module(document, {controller: coordinates.controller, view: coordinates.view});  
+
+</script>

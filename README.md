@@ -1,0 +1,1 @@
+A small example of how to get some data collection (f.ex JSON object) reactively updated with mithril
