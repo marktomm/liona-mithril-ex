@@ -1,5 +1,12 @@
-<!doctype html>
+<!DOCTYPE html>
+<html>
+<head>
 <title>Coordinate app</title>
+<meta content="IE=7" http-equiv="X-UA-Compatible" />
+<meta charset="utf-8">
+<script src="polyfill.js"></script>
+</head>
+<body>
 <script src="mithril.min.js"></script>
 <script>
 var input_json = [
@@ -96,10 +103,10 @@ coordinates.view = function() {
             m("table", [
                 coordinates.vm.list.map(function(coordRow, index) {
                     return m("tr", [
-                        m("input", {onchange: m.withAttr("value", coordRow.x), value: coordRow.x()}),
-                        m("input", {onchange: m.withAttr("value", coordRow.y), value: coordRow.y()}),
-                        m("input", {onchange: m.withAttr("value", coordRow.country), value: coordRow.country()}),
-                        m("input", {onchange: m.withAttr("value", coordRow.url), value: coordRow.url()})
+                        m("td", m("input", {onchange: m.withAttr("value", coordRow.x), value: coordRow.x()})),
+                        m("td", m("input", {onchange: m.withAttr("value", coordRow.y), value: coordRow.y()})),
+                        m("td", m("input", {onchange: m.withAttr("value", coordRow.country), value: coordRow.country()})),
+                        m("td", m("input", {onchange: m.withAttr("value", coordRow.url), value: coordRow.url()}))
                     ])
                 })
             ]),
@@ -114,3 +121,5 @@ coordinates.view = function() {
 m.module(document, {controller: coordinates.controller, view: coordinates.view});  
 
 </script>
+</body>
+</html>
