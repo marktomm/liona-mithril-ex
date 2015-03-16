@@ -4,6 +4,7 @@
 <title>Coordinate app</title>
 <meta content="IE=7" http-equiv="X-UA-Compatible" />
 <meta charset="utf-8">
+<script src="http://code.jquery.com/jquery-1.9.1.js"></script>
 <script src="es5-shim.js"></script>
 </head>
 <body>
@@ -98,27 +99,26 @@ coordinates.controller = function() {
 
 //here's the view
 coordinates.view = function() {
-    return m("html", [
-        m("body", [
-            m("table", [
-                coordinates.vm.list.map(function(coordRow, index) {
-                    return m("tr", [
-                        m("td", m("input", {onchange: m.withAttr("value", coordRow.x), value: coordRow.x()})),
-                        m("td", m("input", {onchange: m.withAttr("value", coordRow.y), value: coordRow.y()})),
-                        m("td", m("input", {onchange: m.withAttr("value", coordRow.country), value: coordRow.country()})),
-                        m("td", m("input", {onchange: m.withAttr("value", coordRow.url), value: coordRow.url()}))
-                    ])
-                })
-            ]),
-            m("button", {onclick: coordinates.vm.update}, "Update"),
-            m("button", {onclick: coordinates.vm.restore}, "Cancel"),
-            m("button", {onclick: coordinates.vm.log}, "Log" )
-        ])
-    ]);
+    return [ 
+                m("table", [
+                    coordinates.vm.list.map(function(coordRow, index) {
+                        return m("tr", [
+                            m("td", m("input", {onchange: m.withAttr("value", coordRow.x), value: coordRow.x()})),
+                            m("td", m("input", {onchange: m.withAttr("value", coordRow.y), value: coordRow.y()})),
+                            m("td", m("input", {onchange: m.withAttr("value", coordRow.country), value: coordRow.country()})),
+                            m("td", m("input", {onchange: m.withAttr("value", coordRow.url), value: coordRow.url()}))
+                        ])
+                    })
+                ]),
+                m("button", {onclick: coordinates.vm.update}, "Update"),
+                m("button", {onclick: coordinates.vm.restore}, "Cancel"),
+                m("button", {onclick: coordinates.vm.log}, "Log" ) 
+            ]
+        
 };
 
 //initialize the application
-m.module(document, {controller: coordinates.controller, view: coordinates.view});  
+m.module(document.body, {controller: coordinates.controller, view: coordinates.view});  
 
 </script>
 </body>
