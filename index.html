@@ -66,7 +66,10 @@ coordinates.vm = (function() {
         
         //update input data with current view
         vm.update = function() {
-            for(i=0; i < data.length; i++) {
+            for(i=0; i < vm.list.length; i++) {
+                if(!data[i])
+                    data.push({x: "", y: "", country: "", url: ""});
+                    
                 data[i].x = vm.list[i].x();
                 data[i].y = vm.list[i].y();
                 data[i].country = vm.list[i].country();
@@ -82,6 +85,12 @@ coordinates.vm = (function() {
                 vm.list[i].country( data[i].country );
                 vm.list[i].url( data[i].url );
             }
+            
+            console.log("vm.list.len ", vm.list.length);
+            
+            if(vm.list.length > data.length)
+                while(vm.list.length != data.length)
+                    vm.list.pop();             
         }
         
         vm.log = function() {
@@ -111,6 +120,7 @@ coordinates.view = function() {
                     })
                 ]),
                 m("button", {onclick: coordinates.vm.update}, "Update"),
+                m("button", {onclick: coordinates.vm.add}, "Add"),
                 m("button", {onclick: coordinates.vm.restore}, "Cancel"),
                 m("button", {onclick: coordinates.vm.log}, "Log" ) 
             ]
