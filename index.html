@@ -14,6 +14,20 @@ var input_json = [
   {"x" : 50, "y" : 55, "country" : "EE", "url" : "#"},
   {"x" : 60, "y" : 65, "country" : "RU", "url" : "#"},
   {"x" : 70, "y" : 75, "country" : "KO", "url" : "#"},
+  {"x" : 70, "y" : 75, "country" : "AA", "url" : "#"},
+  {"x" : 70, "y" : 75, "country" : "BB", "url" : "#"},
+  {"x" : 70, "y" : 75, "country" : "CC", "url" : "#"},
+  {"x" : 70, "y" : 75, "country" : "KO", "url" : "#"},
+  {"x" : 70, "y" : 75, "country" : "DD", "url" : "#"},
+  {"x" : 70, "y" : 75, "country" : "KO", "url" : "#"},
+  {"x" : 70, "y" : 75, "country" : "EE", "url" : "#"},
+  {"x" : 70, "y" : 75, "country" : "FF", "url" : "#"},
+  {"x" : 70, "y" : 75, "country" : "XX", "url" : "#"},
+  {"x" : 70, "y" : 75, "country" : "CC", "url" : "#"},
+  {"x" : 70, "y" : 75, "country" : "ZZ", "url" : "#"},
+  {"x" : 70, "y" : 75, "country" : "DD", "url" : "#"},
+  {"x" : 70, "y" : 75, "country" : "RR", "url" : "#"},
+  {"x" : 70, "y" : 75, "country" : "KO", "url" : "#"},
   {"x" : 80, "y" : 85, "country" : "AU", "url" : "#"}
 ];
   
@@ -41,6 +55,8 @@ coordinates.CoordinateList = Array;
 coordinates.vm = (function() {
     var vm = {}
     vm.init = function(data) {
+        vm.PAGE_LEN = 5;
+    
         //a running list of coordinates
         vm.list = new coordinates.CoordinateList();
         
@@ -64,6 +80,10 @@ coordinates.vm = (function() {
             vm.add();
         }
         
+        vm.pageNum = 1;
+        vm.currentViewElemsBegin = 0;
+        vm.currentView = vm.list.slice(vm.currentViewElemsBegin, vm.currentViewElemsBegin + vm.PAGE_LEN);
+        
         //update input data with current view
         vm.update = function() {
             for(i=0; i < vm.list.length; i++) {
@@ -86,15 +106,39 @@ coordinates.vm = (function() {
                 vm.list[i].url( data[i].url );
             }
             
-            console.log("vm.list.len ", vm.list.length);
-            
             if(vm.list.length > data.length)
                 while(vm.list.length != data.length)
                     vm.list.pop();             
         }
         
+        vm.prev = function() {
+            if(vm.pageNum == 1)
+                return;
+                
+            vm.pageNum--;
+                
+            vm.currentViewElemsBegin -= vm.PAGE_LEN;
+            vm.currentView = vm.list.slice(vm.currentViewElemsBegin, vm.currentViewElemsBegin + vm.PAGE_LEN);
+        }
+        
+        vm.next = function() {
+            if(vm.currentViewElemsBegin + vm.PAGE_LEN > vm.list.length)
+                return;
+        
+            vm.pageNum++;
+            
+            vm.currentViewElemsBegin += vm.PAGE_LEN;
+            
+            if(vm.currentViewElemsBegin + vm.PAGE_LEN > vm.list.length) {
+                vm.currentView = vm.list.slice(vm.currentViewElemsBegin, vm.list.length);
+            } else {
+                vm.currentView = vm.list.slice(vm.currentViewElemsBegin, vm.currentViewElemsBegin + vm.PAGE_LEN);
+            }
+        }
+        
         vm.log = function() {
             console.log(vm.data);
+            console.log(vm.currentView);
         }
     }
     return vm
@@ -110,7 +154,7 @@ coordinates.controller = function() {
 coordinates.view = function() {
     return [ 
                 m("table", [
-                    coordinates.vm.list.map(function(coordRow, index) {
+                    coordinates.vm.currentView.map(function(coordRow, index) {
                         return m("tr", [
                             m("td", m("input", {onchange: m.withAttr("value", coordRow.x), value: coordRow.x()})),
                             m("td", m("input", {onchange: m.withAttr("value", coordRow.y), value: coordRow.y()})),
@@ -122,7 +166,11 @@ coordinates.view = function() {
                 m("button", {onclick: coordinates.vm.update}, "Update"),
                 m("button", {onclick: coordinates.vm.add}, "Add"),
                 m("button", {onclick: coordinates.vm.restore}, "Cancel"),
-                m("button", {onclick: coordinates.vm.log}, "Log" ) 
+                m("button", {onclick: coordinates.vm.log}, "Log" ),
+                m("br"),
+                m("button", {onclick: coordinates.vm.prev}, "Prev" ),
+                m("button", {onclick: coordinates.vm.next}, "Next" ),
+                m("span", {innerHTML: "Page Number " + coordinates.vm.pageNum})
             ]
         
 };
